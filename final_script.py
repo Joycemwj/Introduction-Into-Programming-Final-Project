@@ -18,6 +18,7 @@ data_set = data_set.reset_index()
 data_set['laggdppc'] = data_set.groupby('country')['gdppc'].shift(1)
 data_set['lagelepc'] = data_set.groupby('country')['elepc'].shift(1)
 
+data_set.to_csv('data_file.csv')
 
 # Generating GDP and electrcity consumption grpah
 fig, ax = plt.subplots()
