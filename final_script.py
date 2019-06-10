@@ -8,6 +8,8 @@ from statsmodels.iolib.summary2 import summary_col
 
 gdp_data = wb.download(indicator = 'NY.GDP.PCAP.PP.KD', country='all', start=2004, end=2017).dropna()
 ele_data = wb.download(indicator = 'EG.USE.ELEC.KH.PC', country='all', start=2004, end=2017).dropna()
+gdp_data.to_csv(r'gdp_data.csv', index=False, header=True)
+ele_data.to_csv(r'ele_data.csv', index=False, header=True)
 
 
 data_set = pd.merge(gdp_data, ele_data, on=['country','year'])
@@ -101,7 +103,8 @@ data_set['gdppc'] = np.log(data_set['gdppc'])
 data_set['lagelepc'] = np.log(data_set['lagelepc'])
 data_set['laggdppc'] = np.log(data_set['laggdppc'])
 
-
+# save the final dataset
+data_set.to_csv(r'final_data.csv', index=False, header=True)
 
 # Normal OLS regression
 normal_ols = sm.ols(formula = 'gdppc ~ elepc', data = data_set).fit(cov_type='HC1')
