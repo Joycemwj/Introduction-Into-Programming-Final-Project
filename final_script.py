@@ -18,7 +18,23 @@ data_set = data_set.reset_index()
 data_set['laggdppc'] = data_set.groupby('country')['gdppc'].shift(1)
 data_set['lagelepc'] = data_set.groupby('country')['elepc'].shift(1)
 
-data_set.to_csv('data_file.csv')
+highest_table = data_set.groupby(['country']).agg(
+    {'elepc':'mean', 'gdppc':'mean'}).sort_values(
+    by=['elepc'], ascending=False).head()
+highest_table = highest_table.rename(columns={"elepc":"Electricity Consumption", "gdppc": "GDP per capita"})
+highest_table.index.names = ['Country']
+
+with open('Tex Documents/highest_table.tex','w') as tf:
+    tf.write(highest_table.to_latex())
+
+lowest_table = data_set.groupby(['country']).agg(
+    {'elepc':'mean', 'gdppc':'mean'}).sort_values(
+    by=['elepc'], ascending=True).head()
+lowest_table = lowest_table.rename(columns={"elepc":"Electricity Consumption", "gdppc": "GDP per capita"})
+lowest_table.index.names = ['Country']
+
+with open('Tex Documents/lowest_table.tex','w') as tf:
+    tf.write(lowest_table.to_latex())
 
 # Generating GDP and electrcity consumption grpah
 fig, ax = plt.subplots()
@@ -99,6 +115,16 @@ print(panel_ols.summary())
 panel_ols_lagele = sm.ols(formula = 'gdppc ~ lagelepc + C(country) + C(year)', data = data_set).fit(cov_type='HC1')
 print(panel_ols_lagele.summary())
 
+tble = summary_col([normal_ols, panel_ols, panel_ols_lagele],stars=True,float_format='%0.2f',
+                  model_names=['OLS\n(1)','Panel\n(2)', 'Lagged Panel\n(3)'],
+                  info_dict={'N':lambda x: "{0:d}".format(int(x.nobs)),
+                             'R2':lambda x: "{:.2f}".format(x.rsquared)},
+                  regressor_order = ['elepc','lagelepc', 'Intercept'],
+                  drop_omitted = True)
+print(tble)
+f = open('res.tex', 'w')
+f.write(tble.as_latex())
+f.close()
 
 
 

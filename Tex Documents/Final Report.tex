@@ -1,0 +1,107 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin = 1.3in, top=1in]{geometry}
+\usepackage[doublespacing]{setspace}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{tgtermes}
+\usepackage{longtable}
+\usepackage{mathptmx}
+\usepackage{newtxmath}
+\usepackage{caption}
+\usepackage{makecell}
+\usepackage{physics}
+\usepackage[authoryear, round]{natbib}
+\usepackage{lscape}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{makecell}
+\usepackage{authblk}
+\usepackage[flushleft]{threeparttable}
+\usepackage{subcaption,siunitx,booktabs}
+
+
+\title{The Relationship Between Electricity Consumption and GDP}
+\author{Wenjia Ma}
+\affil{Harris School of Public Policy}
+\date{\today}
+
+\begin{document}
+	\maketitle
+	
+	\section{Introduction}
+	In this project, I analyzed the relationship between energy usage and gross domestic product with data of 181 countries from 2004 to 2017. With both OLS regression and panel regressions, I found positive relationship between energy consumption and GDP.
+	
+	The causality relationship between energy consumption and income is a well-studied topic in energy economics. Intuitively speaking, more energy consumption usually indicates more production and economic behavior. As we can see from Table \ref{highest} and Table \ref{lowest}, countries with high electricity consumption level have much higher GDP per capita in general.
+	
+	\begin{table}
+		\centering
+		\caption{5 Countries With Highest Electricity Consumption}
+		\input{highest_table.tex}
+		\label{highest}
+	\end{table}
+			
+	\begin{table}
+		\centering
+		\caption{5 Countries With Lowest Electricity Consumption}
+		\input{lowest_table.tex}
+		\label{lowest}
+	\end{table}
+		
+	However, to testify this relationship, we need to understand the difference between comparison across countries and comparison within countries across time. Take Iceland as an example, due to the harsh environment, Icelanders tend to consume more energy on domestic heating. If we compare the energy usage per capita of Iceland to countries with less difficult climate, such as the United States, we will falsely draw the conclusion that Iceland has higher GDP per capita than the U.S.. In order to avoid this problem, I will use regression with fixed effects to control for variation across different countries and focus on the comparison within one country at different time point.
+	
+	
+	
+	\section{Empirical Strategy}
+	To figure out the relationship between electricity consumption, I estimate the following equation:
+	
+	\begin{equation}
+		y_{it} = \beta_0 + \beta_1 E_{it} + \delta_t + \lambda_i + \varepsilon
+ 	\end{equation} 
+	
+	where $y_{it}$ is the GDP per capita for country $i$ in year $t$, $E_{it}$ is the electricity consumption per capita, $\delta_t$ is year fixed effect, $\lambda_i$ is country fixed effect. 
+	
+	Moreover, when estimating the effect of energy consumption on GDP growth, there is also concerns of endogeneity. It is hard to determine whether the increase in energy consumption leads to more production, or higher GDP induces more energy consumption. I decide to use lagged independent variable as a proxy of the present value. The idea is that GDP this year is unlikely to affect the energy consumption last year. Then the regression equation becomes:
+	
+	\begin{equation}
+		y_{it} = \beta_0 + \beta_1 E_{it-1} + \delta_t + \lambda_i + \varepsilon
+	\end{equation}
+	
+	What should be noticed is that, I use log transformation for all the variables used in the regressions. So, the coefficients are easier to interpret.
+	
+	\section{Data}
+	I collected data on GDP per capita and energy consumption per capita from the World Bank. Both data sets cover 181 countries from 2004 to 2017. Before quantitative analysis, Figure \ref{logplot} gives us a brief idea of what the data looks like. We can see from the graph that both Ethiopia (Green) and China (Red) show positive relationship between their GDP per capita and energy consumption per capita. On the other hand, the line of the United States (Blue) stagnated at the same place during this period. The line of New Zealand (Purple) shows negative relationship. Based on this fact, it is possible that countries during primary development have strong positive correlation between energy consumption and production, while well-developed countries may have different pattern. Thus, I decide to use quantile regression to capture the heterogeneous effects in different countries. 
+	
+			\begin{center}
+				\begin{figure}[ht!]
+					\centering
+					\caption{Log Plot of GDP per capita and Energy Consumption per capita}
+					\includegraphics*[scale = 0.9]{gdpele_country_log.png} 
+					\label{logplot}
+				\end{figure}
+			\end{center}	
+	
+	\section{Results}
+	From Table \ref{results}, we can see that all the regressions indicate a positive relationship between electricity consumption and GDP per capita. With OLS, a 1\% increase in the electricity consumption per capita induces a 0.68\% increase in GDP per capita. With panel setting, the results are smaller but also significant. This finding is consistent with lagged variables.
+	 
+	\input{res.tex}
+	
+	From Figure \ref{quantile}, we can see that the relationship between electricity consumption and GDP differs at different level of energy consumption. More specifically, the relationship is weaker for countries with the lowest or highest electricity consumption per capita. This result echos the conjecture I made according to Figure \ref{logplot}. However, there is no reverse relationship.
+	
+	
+
+	\begin{center}
+		\begin{figure}[ht!]
+			\centering
+			\caption{Quantile Regression Results}
+			\includegraphics*[scale = 0.7]{quantile_regression.png} 
+			\label{quantile}
+		\end{figure}
+	\end{center}		
+	
+	\section{Conclusion}
+	In this study, I use electricity consumption and GDP data from World Bank to analyze the relationship between energy consumption and gross domestic product. According to plot and regressions, the relationship is positive, meaning higher electricity consumption leads to higher GDP in general. However, this study suffers from the fact that I didn't include any covariate. Also, the auto-correlation should raise one's concern, since the R-square in panel regression is abnormally high. These are the points I will continue to work on in my future research.
+	
+	
+\end{document}
